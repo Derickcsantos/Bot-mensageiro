@@ -1,0 +1,7 @@
+Orientações gerais sobre a pasta planilhas
+
+1. Nesta pasta estarão as planilhas que o sistema lerá para enviar os emails
+
+2. Adicione planilhas no formato .xlsx
+
+3. Não é necessário que a planilha esteja formatada como tabela, somente que a primeira linha esteja escrito "Email"
