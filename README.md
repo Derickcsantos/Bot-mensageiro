@@ -5,10 +5,12 @@
 ## Introdução ao projeto :mag:
 Robô desenvolvido para enviar e-mail's para usuários com base em uma planilha de dados, utilizada principalmente no setor comercial para capturar leads com mais eficacia. 
 
+
 ## Tecnologias  :computer:
 Para desenvolvimento desse projeto, foram utilizados **Node.js**, **Express.js**, **SheetJs** e **Nodemailer**
 
-## Como rodar o projeto
+
+## Como rodar o projeto :floppy_disk:
 
 1. Clone o repositório
 ```Bash
