@@ -1,0 +1,5 @@
+email-sender/
+├── planilhas/
+│   └── emails.xlsx         ← Sua planilha (formato .xlsx)
+├── server.js               ← Servidor principal
+├── package.json
