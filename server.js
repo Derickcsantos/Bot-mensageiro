@@ -1,14 +1,23 @@
+// server.js
 const dotenv = require('dotenv');
 const express = require('express');
 const multer = require('multer');
 const XLSX = require('xlsx');
 const nodemailer = require('nodemailer');
 const fs = require('fs');
+const path = require('path');
 
+dotenv.config();
 const app = express();
 const PORT = 3000;
 
-// Configurar transporte de e-mail
+// Servir arquivos estáticos
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Configurar Multer para upload
+const upload = multer({ dest: 'uploads/' });
+
+// Nodemailer
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -17,41 +26,43 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-app.get('/', (req, res) =>{
-    res.send('Seu servidor está rodando, para enviar os emails, acesse a rota /enviar-emails');
+// Rota inicial
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Enviar e-mails a partir de uma planilha
-app.get('/enviar-emails', async (req, res) => {
+// Rota de envio de e-mails via POST
+app.post('/enviar-emails', upload.single('file'), async (req, res) => {
   try {
-    const filePath = './planilhas/teste.xlsx';
+    const { subject, message } = req.body;
+    const filePath = req.file.path;
 
-    if (!fs.existsSync(filePath)) {
-      return res.status(404).send('Planilha não encontrada.');
-    }
+    if (!filePath) return res.status(400).send('Arquivo da planilha não enviado.');
 
     const workbook = XLSX.readFile(filePath);
-    const sheetName = workbook.SheetNames[0];
-    const sheet = workbook.Sheets[sheetName];
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const data = XLSX.utils.sheet_to_json(sheet);
 
     const emails = data.map(row => row.Email).filter(Boolean);
 
     for (const email of emails) {
       await transporter.sendMail({
-        from: '"Nome do Remetente" derickcampossantos1@gmail.com',
+        from: `"Remetente" <${process.env.EMAIL_USER}>`,
         to: email,
-        subject: 'Primeiro passo para o sucesso',
-        text: 'Olá! Chegou a hora de dar um novo passo!',
+        subject: subject,
+        text: message,
       });
 
       console.log(`E-mail enviado para: ${email}`);
     }
 
+    // Apagar o arquivo depois do uso
+    fs.unlinkSync(filePath);
+
     res.send(`E-mails enviados com sucesso para ${emails.length} destinatários.`);
   } catch (err) {
-    console.error('Erro:', err);
-    res.status(500).send('Erro ao processar os e-mails.');
+    console.error('Erro ao enviar e-mails:', err);
+    res.status(500).send('Erro ao processar o envio de e-mails.');
   }
 });
 
