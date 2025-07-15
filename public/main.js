@@ -25,3 +25,15 @@ document.getElementById('email-form').addEventListener('submit', async function 
     console.error(err);
   }
 });
+
+
+document.getElementById('file').addEventListener('change', function (event) {
+  const file = event.target.files[0];
+  const label = document.getElementById('file-label');
+
+  if (file) {
+    label.textContent = `📄 ${file.name}`;
+  } else {
+    label.textContent = 'Selecione um arquivo';
+  }
+});
